@@ -55,7 +55,6 @@ export class GameEditComponent implements OnInit {
           publisher: game.publisher,
           genre: game.genre,
           platform: game.platform,
-          // Format date for the input[type="date"]
           releaseDate: game.releaseDate.split('T')[0],
           price: game.price
         });
@@ -77,7 +76,7 @@ export class GameEditComponent implements OnInit {
         ...this.gameForm.value
       };
 
-   const operation: Observable<any> = this.isNewGame
+      const operation: Observable<any> = this.isNewGame
         ? this.gameService.create(gameData)
         : this.gameService.update(this.gameId!, gameData);
 
@@ -101,7 +100,6 @@ export class GameEditComponent implements OnInit {
   // Helper method to check if a field is invalid
   isFieldInvalid(fieldName: string): boolean {
     const field = this.gameForm.get(fieldName);
-    // Check if field exists, is invalid, and has been touched
     return !!(field && field.invalid && field.touched);
   }
 }

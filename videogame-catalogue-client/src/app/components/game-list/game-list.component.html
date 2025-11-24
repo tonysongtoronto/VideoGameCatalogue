@@ -1,63 +1,157 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Video Game Catalogue</h1>
-    <button class="btn btn-primary" (click)="createGame()">
-      Add New Game
-    </button>
-  </div>
-
-  <div *ngIf="loading" class="text-center my-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
+<div class="game-catalogue-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="header-left">
+        <h1 class="main-title">🎮 Video Game Catalogue</h1>
+        <p class="subtitle">Manage your favorite games collection</p>
+      </div>
+      <button class="btn-add-game" (click)="createGame()">
+        <span class="btn-icon">+</span>
+        Add New Game
+      </button>
     </div>
-    <p class="mt-2 text-muted">Loading games...</p>
   </div>
 
-  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
-    {{ error }}
-    <button type="button" class="btn-close" (click)="error = null"></button>
+  <!-- Search and Filter Section -->
+  <div class="filter-section" *ngIf="!loading && !error">
+    <div class="filter-container">
+      <!-- Search Bar -->
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+          placeholder="Search by title or publisher...">
+        <button
+          *ngIf="searchTerm"
+          class="clear-search-btn"
+          (click)="searchTerm = ''; onSearchChange()">
+          ×
+        </button>
+      </div>
+
+      <!-- Filters Row -->
+      <div class="filters-row">
+        <div class="filter-group">
+          <label class="filter-label">Genre</label>
+          <select
+            class="filter-select"
+            [(ngModel)]="filterGenre"
+            (ngModelChange)="onFilterChange()">
+            <option value="">All Genres</option>
+            <option *ngFor="let genre of allGenres" [value]="genre">{{ genre }}</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Platform</label>
+          <select
+            class="filter-select"
+            [(ngModel)]="filterPlatform"
+            (ngModelChange)="onFilterChange()">
+            <option value="">All Platforms</option>
+            <option *ngFor="let platform of allPlatforms" [value]="platform">{{ platform }}</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">Sort By</label>
+          <select
+            class="filter-select"
+            [(ngModel)]="sortBy"
+            (ngModelChange)="onFilterChange()">
+            <option value="title">Title (A-Z)</option>
+            <option value="price-low">Price (Low to High)</option>
+            <option value="price-high">Price (High to Low)</option>
+            <option value="date-new">Release Date (Newest)</option>
+            <option value="date-old">Release Date (Oldest)</option>
+          </select>
+        </div>
+
+        <button
+          class="btn-clear-filters"
+          (click)="clearFilters()"
+          *ngIf="searchTerm || filterGenre || filterPlatform || sortBy !== 'title'">
+          Clear All
+        </button>
+      </div>
+
+      <!-- Results Info -->
+      <div class="results-info">
+        <span class="results-count">
+          Showing {{ filteredGames.length }} of {{ games.length }} games
+        </span>
+      </div>
+    </div>
   </div>
 
-  <div *ngIf="!loading && !error">
-    <div class="table-responsive">
-      <table class="table table-striped table-hover">
-        <thead class="table-dark">
-          <tr>
-            <th>Title</th>
-            <th>Publisher</th>
-            <th>Genre</th>
-            <th>Platform</th>
-            <th>Release Date</th>
-            <th>Price</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let game of games">
-            <td>{{ game.title }}</td>
-            <td>{{ game.publisher }}</td>
-            <td><span class="badge bg-secondary">{{ game.genre }}</span></td>
-            <td><span class="badge bg-info text-dark">{{ game.platform }}</span></td>
-            <td>{{ game.releaseDate | date:'mediumDate' }}</td>
-            <td>{{ game.price | currency }}</td>
-            <td>
-              <button
-                class="btn btn-sm btn-outline-primary me-2"
-                (click)="editGame(game.id)">
-                Edit
-              </button>
-              <button
-                class="btn btn-sm btn-outline-danger"
-                (click)="deleteGame(game.id)">
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p class="loading-text">Loading your games...</p>
+  </div>
 
-      <div *ngIf="games.length === 0" class="text-center text-muted mt-4">
-        <p>No games found. Add your first game to get started!</p>
+  <!-- Error State -->
+  <div *ngIf="error" class="error-alert">
+    <span class="error-icon">⚠️</span>
+    <span class="error-message">{{ error }}</span>
+    <button class="error-close" (click)="error = null">×</button>
+  </div>
+
+  <!-- Games Grid -->
+  <div *ngIf="!loading && !error" class="games-container">
+    <div *ngIf="filteredGames.length === 0 && games.length === 0" class="empty-state">
+      <div class="empty-icon">🎯</div>
+      <h2>No Games Yet</h2>
+      <p>Start building your collection by adding your first game!</p>
+      <button class="btn-add-first" (click)="createGame()">Add Your First Game</button>
+    </div>
+
+    <div *ngIf="filteredGames.length === 0 && games.length > 0" class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h2>No Results Found</h2>
+      <p>Try adjusting your search or filters</p>
+      <button class="btn-add-first" (click)="clearFilters()">Clear Filters</button>
+    </div>
+
+    <div *ngIf="filteredGames.length > 0" class="games-grid">
+      <div class="game-card" *ngFor="let game of filteredGames">
+        <div class="card-header">
+          <div class="platform-badge" [ngClass]="getPlatformClass(game.platform)">
+            {{ game.platform }}
+          </div>
+          <div class="card-actions">
+            <button class="action-btn edit-btn" (click)="editGame(game.id)" title="Edit">
+              ✏️
+            </button>
+            <button class="action-btn delete-btn" (click)="deleteGame(game.id)" title="Delete">
+              🗑️
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <h3 class="game-title">{{ game.title }}</h3>
+          <p class="game-publisher">by {{ game.publisher }}</p>
+
+          <div class="game-details">
+            <div class="detail-item">
+              <span class="detail-label">Genre</span>
+              <span class="genre-badge">{{ game.genre }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Release</span>
+              <span class="detail-value">{{ game.releaseDate | date:'MMM yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <span class="price-tag">{{ game.price | currency }}</span>
+        </div>
       </div>
     </div>
   </div>

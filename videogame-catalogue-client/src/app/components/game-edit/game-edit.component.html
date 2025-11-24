@@ -1,126 +1,144 @@
-<div class="container mt-4">
-  <div class="row justify-content-center">
-    <div class="col-md-8">
-      <h1 class="mb-4">{{ isNewGame ? 'Add New Game' : 'Edit Game' }}</h1>
+<div class="edit-container">
+  <div class="edit-card">
+    <div class="edit-header">
+      <h1 class="edit-title">{{ isNewGame ? '✨ Add New Game' : '✏️ Edit Game' }}</h1>
+      <p class="edit-subtitle">{{ isNewGame ? 'Add a new game to your collection' : 'Update game information' }}</p>
+    </div>
 
-      <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ error }}
-        <button type="button" class="btn-close" (click)="error = null"></button>
-      </div>
+    <div *ngIf="error" class="error-banner">
+      <span class="error-icon">⚠️</span>
+      <span>{{ error }}</span>
+      <button class="error-close" (click)="error = null">×</button>
+    </div>
 
-      <div class="card">
-        <div class="card-body">
-          <form [formGroup]="gameForm" (ngSubmit)="onSubmit()">
-            <div class="mb-3">
-              <label for="title" class="form-label">Title *</label>
-              <input
-                type="text"
-                class="form-control"
-                id="title"
-                formControlName="title"
-                [class.is-invalid]="isFieldInvalid('title')"
-                placeholder="Enter game title">
-              <div class="invalid-feedback" *ngIf="isFieldInvalid('title')">
-                Title is required (max 200 characters)
-              </div>
-            </div>
+    <form [formGroup]="gameForm" (ngSubmit)="onSubmit()" class="game-form">
+      <div class="form-section">
+        <div class="form-group">
+          <label for="title" class="form-label">
+            <span class="label-text">Game Title</span>
+            <span class="label-required">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-input"
+            id="title"
+            formControlName="title"
+            [class.input-error]="isFieldInvalid('title')"
+            placeholder="Enter the game title">
+          <div class="error-message" *ngIf="isFieldInvalid('title')">
+            Title is required (max 200 characters)
+          </div>
+        </div>
 
-            <div class="mb-3">
-              <label for="publisher" class="form-label">Publisher *</label>
-              <input
-                type="text"
-                class="form-control"
-                id="publisher"
-                formControlName="publisher"
-                [class.is-invalid]="isFieldInvalid('publisher')"
-                placeholder="Enter publisher name">
-              <div class="invalid-feedback" *ngIf="isFieldInvalid('publisher')">
-                Publisher is required (max 100 characters)
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="genre" class="form-label">Genre *</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="genre"
-                  formControlName="genre"
-                  [class.is-invalid]="isFieldInvalid('genre')"
-                  placeholder="e.g., Action, RPG, Strategy">
-                <div class="invalid-feedback" *ngIf="isFieldInvalid('genre')">
-                  Genre is required (max 50 characters)
-                </div>
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label for="platform" class="form-label">Platform *</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="platform"
-                  formControlName="platform"
-                  [class.is-invalid]="isFieldInvalid('platform')"
-                  placeholder="e.g., PC, PlayStation 5">
-                <div class="invalid-feedback" *ngIf="isFieldInvalid('platform')">
-                  Platform is required (max 50 characters)
-                </div>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label for="releaseDate" class="form-label">Release Date *</label>
-                <input
-                  type="date"
-                  class="form-control"
-                  id="releaseDate"
-                  formControlName="releaseDate"
-                  [class.is-invalid]="isFieldInvalid('releaseDate')">
-                <div class="invalid-feedback" *ngIf="isFieldInvalid('releaseDate')">
-                  Release date is required
-                </div>
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label for="price" class="form-label">Price *</label>
-                <div class="input-group">
-                  <span class="input-group-text">$</span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    class="form-control"
-                    id="price"
-                    formControlName="price"
-                    [class.is-invalid]="isFieldInvalid('price')"
-                    placeholder="0.00">
-                  <div class="invalid-feedback" *ngIf="isFieldInvalid('price')">
-                    Price is required and must be positive
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="d-flex gap-2 mt-4">
-              <button
-                type="submit"
-                class="btn btn-primary"
-                [disabled]="!gameForm.valid || loading">
-                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-                {{ loading ? 'Saving...' : 'Save' }}
-              </button>
-              <button
-                type="button"
-                class="btn btn-secondary"
-                (click)="cancel()"
-                [disabled]="loading">
-                Cancel
-              </button>
-            </div>
-          </form>
+        <div class="form-group">
+          <label for="publisher" class="form-label">
+            <span class="label-text">Publisher</span>
+            <span class="label-required">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-input"
+            id="publisher"
+            formControlName="publisher"
+            [class.input-error]="isFieldInvalid('publisher')"
+            placeholder="e.g., Nintendo, Sony, Microsoft">
+          <div class="error-message" *ngIf="isFieldInvalid('publisher')">
+            Publisher is required (max 100 characters)
+          </div>
         </div>
       </div>
-    </div>
+
+      <div class="form-section form-row">
+        <div class="form-group">
+          <label for="genre" class="form-label">
+            <span class="label-text">Genre</span>
+            <span class="label-required">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-input"
+            id="genre"
+            formControlName="genre"
+            [class.input-error]="isFieldInvalid('genre')"
+            placeholder="e.g., Action, RPG, Strategy">
+          <div class="error-message" *ngIf="isFieldInvalid('genre')">
+            Genre is required (max 50 characters)
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="platform" class="form-label">
+            <span class="label-text">Platform</span>
+            <span class="label-required">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-input"
+            id="platform"
+            formControlName="platform"
+            [class.input-error]="isFieldInvalid('platform')"
+            placeholder="e.g., PC, PlayStation 5, Xbox">
+          <div class="error-message" *ngIf="isFieldInvalid('platform')">
+            Platform is required (max 50 characters)
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section form-row">
+        <div class="form-group">
+          <label for="releaseDate" class="form-label">
+            <span class="label-text">Release Date</span>
+            <span class="label-required">*</span>
+          </label>
+          <input
+            type="date"
+            class="form-input"
+            id="releaseDate"
+            formControlName="releaseDate"
+            [class.input-error]="isFieldInvalid('releaseDate')">
+          <div class="error-message" *ngIf="isFieldInvalid('releaseDate')">
+            Release date is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="price" class="form-label">
+            <span class="label-text">Price</span>
+            <span class="label-required">*</span>
+          </label>
+          <div class="input-group">
+            <span class="input-prefix">$</span>
+            <input
+              type="number"
+              step="0.01"
+              class="form-input input-with-prefix"
+              id="price"
+              formControlName="price"
+              [class.input-error]="isFieldInvalid('price')"
+              placeholder="0.00">
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('price')">
+            Price is required and must be positive
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="!gameForm.valid || loading">
+          <span *ngIf="loading" class="btn-spinner"></span>
+          <span>{{ loading ? 'Saving...' : 'Save Game' }}</span>
+        </button>
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="cancel()"
+          [disabled]="loading">
+          Cancel
+        </button>
+      </div>
+    </form>
   </div>
 </div>
