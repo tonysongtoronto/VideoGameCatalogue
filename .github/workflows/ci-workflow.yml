@@ -1,40 +1,72 @@
+# ----------------------------------------
+# Full-Stack CI Workflow for .NET + Angular
+# ----------------------------------------
 name: CI Workflow
 
-# ✅ 触发条件
+# 🔁 触发条件：当推送到 main 分支或 PR 到 main 时运行
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 
-# ✅ 工作流任务
+# 🧱 定义工作流任务
 jobs:
   build:
+    # 使用 Ubuntu 最新 LTS 运行器
     runs-on: ubuntu-latest
+
+    # 全局环境变量（可在所有 steps 中通过 ${{ env.VAR }} 使用）
     env:
+      SOLUTION_PATH: VideoGameCatalogue.sln
       BACKEND_PROJECT_PATH: VideoGameCatalogue/VideoGameCatalogue.csproj
       TEST_PROJECT_PATH: VideoGameCatalogue.Tests/VideoGameCatalogue.Tests.csproj
       FRONTEND_DIR: videogame-catalogue-client
 
+    # 所有执行步骤
     steps:
-      # 1. 拉取代码
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      # 1. 检出代码
+      - name: 1. Checkout repository
+        uses: actions/checkout@v4
 
-      # 2. 设置 Node.js
-      - name: Setup Node.js 22
-        uses: actions/setup-node@v3
+      # ----------------------------------------
+      # 后端 (.NET/C#) 步骤
+      # ----------------------------------------
+      - name: 2. Setup .NET 9 SDK
+        uses: actions/setup-dotnet@v4
         with:
-          node-version: '22'
+          dotnet-version: '9.0.x'
 
-      # 3. 安装前端依赖
-      - name: Install Frontend Dependencies (npm install)
+      - name: 3. Restore Dependencies
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+      - name: 4. Build Backend Project (Release Configuration)
+        run: dotnet build ${{ env.BACKEND_PROJECT_PATH }} --configuration Release --no-restore
+
+      - name: 5. Run Unit Tests
+        run: dotnet test ${{ env.TEST_PROJECT_PATH }} --configuration Debug --no-build
+
+      # ----------------------------------------
+      # 前端 (Node.js/Angular) 步骤
+      # ----------------------------------------
+      - name: 6. Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'  # 可选：启用 npm 缓存加速安装
+
+      - name: 7. Install Frontend Dependencies (npm install)
         run: |
           cd ${{ env.FRONTEND_DIR }}
           npm install
 
-      # 4. 构建前端
-      - name: Build Frontend (npm run build)
+      - name: 8. Build Frontend (npm run build)
         run: |
           cd ${{ env.FRONTEND_DIR }}
           npm run build --if-present
+
+      # ----------------------------------------
+      # 总结
+      # ----------------------------------------
+      - name: 9. CI Summary
+        run: echo "✅ Full-Stack CI/CD Workflow finished successfully!"
