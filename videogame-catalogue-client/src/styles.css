@@ -4,15 +4,35 @@
   box-sizing: border-box;
 }
 
+html {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: transparent;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
 }
 
 html, body {
   width: 100%;
   min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* 确保Angular根组件也有背景 */
+app-root {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  background: transparent;
 }
