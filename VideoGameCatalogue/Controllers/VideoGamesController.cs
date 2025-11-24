@@ -52,7 +52,7 @@ public class VideoGamesController : ControllerBase
             if (!await VideoGameExists(id)) return NotFound();
             throw;
         }
-        return NoContent();
+       ? return NoContent();
     }
 
     [HttpDelete("{id}")]
