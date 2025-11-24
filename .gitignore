@@ -1,0 +1,53 @@
+# ------------------------
+# JetBrains Rider/ReSharper/Visual Studio
+# ------------------------
+.idea/
+*.iws
+*.iml
+*.ipr
+*.user
+*.suo
+*.sln.docstates
+.vs/
+
+# ------------------------
+# Build and Output Folders
+# ------------------------
+[Oo]bj/
+[Bb]in/
+[Dd]ebug/
+[Rr]elease/
+
+# ------------------------
+# Dependencies
+# ------------------------
+packages/
+*.nupkg
+project.lock.json
+project.assets.json
+
+# ------------------------
+# Test Results
+# ------------------------
+TestResults/
+*.trx
+*.dotcover
+
+# ------------------------
+# Operating System & Temp Files
+# ------------------------
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ------------------------
+# Logs and Temp Files
+# ------------------------
+*.log
+*.tmp
+*.temp
+*.cache
+*~$
+*.swp
+*.swo
+*.swn
