@@ -1,41 +1,41 @@
-﻿# RunTests.ps1 - PowerShell 脚本
+﻿# RunTests.ps1 - PowerShell script
 
-# 设置测试项目目录名称
+# Set the test project directory name
 $TestProjectName = "VideoGameCatalogue.Tests"
 
-Write-Host "--- 开始自动运行 .NET 测试 ---"
+Write-Host "--- Starting automatic .NET test run ---"
 
-# 检查测试项目目录是否存在
+# Check if the test project directory exists
 if (Test-Path $TestProjectName) {
-    # 导航到测试项目目录
+    # Navigate to the test project directory
     Set-Location $TestProjectName
     
-    Write-Host "正在进入目录: $($TestProjectName)"
+    Write-Host "Entering directory: $($TestProjectName)"
     
-    # 运行 dotnet test 命令
-    # -c Release: 以 Release 配置运行（通常更快）
-    # --logger "console;verbosity=normal": 设置控制台输出级别
-    Write-Host "正在执行 dotnet test..."
+    # Run dotnet test command
+    # -c Debug: Run in Debug configuration (includes full debug symbols)
+    # --logger "console;verbosity=normal": Set console output verbosity
+    Write-Host "Executing dotnet test..."
     
     try {
         dotnet test -c Debug --logger "console;verbosity=normal"
         
-        # 检查上一个命令的退出代码
+        # Check the exit code of the last command
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "✅ 所有测试成功通过！" -ForegroundColor Green
+            Write-Host "✅ All tests passed successfully!" -ForegroundColor Green
         } else {
-            Write-Host "❌ 部分测试失败！请查看详细输出。" -ForegroundColor Red
+            Write-Host "❌ Some tests failed! Please review the detailed output." -ForegroundColor Red
         }
     } catch {
-        Write-Host "发生错误：无法运行 dotnet test。" -ForegroundColor Red
+        Write-Host "An error occurred: Unable to run dotnet test." -ForegroundColor Red
         Write-Host $_
     }
     
-    # 返回到脚本开始时的目录
+    # Return to the original directory
     Set-Location ..
     
 } else {
-    Write-Host "❌ 错误：未找到测试项目目录 $($TestProjectName)" -ForegroundColor Red
+    Write-Host "❌ Error: Test project directory $($TestProjectName) not found." -ForegroundColor Red
 }
 
-Write-Host "--- 自动测试运行结束 ---"
+Write-Host "--- Automatic test run completed ---"

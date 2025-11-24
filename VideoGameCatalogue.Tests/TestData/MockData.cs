@@ -3,12 +3,12 @@ using VideoGameCatalogue.Models;
 namespace VideoGameCatalogue.Tests.TestData;
 
 /// <summary>
-/// 提供测试用的模拟数据
+/// Provides mock data for testing
 /// </summary>
 public static class MockData
 {
     /// <summary>
-    /// 获取测试用的游戏列表
+    /// Returns a list of test video games
     /// </summary>
     public static List<VideoGame> GetTestGames()
     {
@@ -68,7 +68,7 @@ public static class MockData
     }
 
     /// <summary>
-    /// 获取单个测试游戏
+    /// Returns a single test video game
     /// </summary>
     public static VideoGame GetSingleTestGame()
     {
@@ -85,7 +85,7 @@ public static class MockData
     }
 
     /// <summary>
-    /// 获取新游戏（无 ID）
+    /// Returns a new video game instance for creation (without an ID)
     /// </summary>
     public static VideoGame GetNewGameForCreation()
     {
@@ -101,7 +101,7 @@ public static class MockData
     }
 
     /// <summary>
-    /// 获取更新后的游戏数据
+    /// Returns an updated video game instance (with existing ID)
     /// </summary>
     public static VideoGame GetUpdatedGame()
     {
@@ -118,18 +118,18 @@ public static class MockData
     }
 
     /// <summary>
-    /// 获取无效游戏（用于测试验证）
+    /// Returns an invalid video game instance (for validation tests)
     /// </summary>
     public static VideoGame GetInvalidGame()
     {
         return new VideoGame
         {
             Id = -1,
-            Title = "", // 空标题
+            Title = "", // Empty title
             Publisher = "",
             Genre = "",
             ReleaseDate = DateTime.MinValue,
-            Price = -10.00m, // 负价格
+            Price = -10.00m, // Negative price
             Platform = ""
         };
     }

@@ -7,18 +7,13 @@ using Xunit;
 namespace VideoGameCatalogue.Tests;
 
 /// <summary>
-/// 测试 GameDbContext 的功能
+/// Tests for GameDbContext functionality using in-memory database.
 /// </summary>
 public class GameDbContextTests
 {
-    // *** 修改 1: GetInMemoryDbContext() 只创建空的上下文 ***
-    /// <summary>
-    /// 创建内存数据库上下文
-    /// </summary>
-    private GameDbContext GetInMemoryDbContext(string dbName)
+    private GameDbContext CreateContext(string dbName)
     {
         var options = new DbContextOptionsBuilder<GameDbContext>()
-            // 使用传入的唯一名称
             .UseInMemoryDatabase(databaseName: dbName)
             .Options;
 
@@ -29,42 +24,42 @@ public class GameDbContextTests
     public async Task CanAddGameToDatabase()
     {
         var dbName = Guid.NewGuid().ToString();
-        // Arrange
-        using var context = GetInMemoryDbContext(dbName);
         var game = MockData.GetSingleTestGame();
 
         // Act
-        context.VideoGames.Add(game);
-        await context.SaveChangesAsync();
-        // context 在这里被释放
+        using (var context = CreateContext(dbName))
+        {
+            context.VideoGames.Add(game);
+            await context.SaveChangesAsync();
+        }
 
-        // Assert: 使用新的上下文验证持久化
-        using var validationContext = GetInMemoryDbContext(dbName);
-        var savedGame = await validationContext.VideoGames.FindAsync(game.Id);
-        Assert.NotNull(savedGame);
-        Assert.Equal(game.Title, savedGame.Title);
+        // Assert
+        using (var context = CreateContext(dbName))
+        {
+            var savedGame = await context.VideoGames.FindAsync(game.Id);
+            Assert.NotNull(savedGame);
+            Assert.Equal(game.Title, savedGame.Title);
+        }
     }
 
     [Fact]
     public async Task CanRetrieveAllGames()
     {
         var dbName = Guid.NewGuid().ToString();
-        // Arrange: 填充数据
-        using (var setupContext = GetInMemoryDbContext(dbName))
-        {
-            var games = MockData.GetTestGames();
-            setupContext.VideoGames.AddRange(games);
-            await setupContext.SaveChangesAsync();
-        }
-        
-        // Act & Assert: 使用新的上下文读取
-        using (var context = GetInMemoryDbContext(dbName))
-        {
-            // Act
-            var retrievedGames = await context.VideoGames.ToListAsync();
+        var expectedCount = MockData.GetTestGames().Count;
 
-            // Assert
-            Assert.Equal(MockData.GetTestGames().Count, retrievedGames.Count);
+        // Arrange
+        using (var context = CreateContext(dbName))
+        {
+            context.VideoGames.AddRange(MockData.GetTestGames());
+            await context.SaveChangesAsync();
+        }
+
+        // Act & Assert
+        using (var context = CreateContext(dbName))
+        {
+            var retrievedGames = await context.VideoGames.ToListAsync();
+            Assert.Equal(expectedCount, retrievedGames.Count);
         }
     }
 
@@ -72,32 +67,32 @@ public class GameDbContextTests
     public async Task CanUpdateGame()
     {
         var dbName = Guid.NewGuid().ToString();
-        var gameToUpdate = MockData.GetSingleTestGame();
-        
-        // Arrange: 填充初始数据
-        using (var setupContext = GetInMemoryDbContext(dbName))
+        var originalGame = MockData.GetSingleTestGame();
+        const decimal updatedPrice = 99.99m;
+
+        // Arrange
+        using (var context = CreateContext(dbName))
         {
-            setupContext.VideoGames.Add(gameToUpdate);
-            await setupContext.SaveChangesAsync();
+            context.VideoGames.Add(originalGame);
+            await context.SaveChangesAsync();
         }
 
-        // Act: 执行更新操作
-        using (var updateContext = GetInMemoryDbContext(dbName))
+        // Act
+        using (var context = CreateContext(dbName))
         {
-            // Attach 现有的跟踪对象（这里我们从 Mock 中再次创建，并手动设置 ID）
-            var game = await updateContext.VideoGames.FindAsync(gameToUpdate.Id);
+            var game = await context.VideoGames.FindAsync(originalGame.Id);
             Assert.NotNull(game);
-            
-            game.Price = 99.99m;
-            // updateContext.VideoGames.Update(game); // Find/Attach 后会自动跟踪
-            await updateContext.SaveChangesAsync();
+
+            game.Price = updatedPrice;
+            await context.SaveChangesAsync();
         }
-        
-        // Assert: 使用新的上下文验证更新结果
-        using (var validationContext = GetInMemoryDbContext(dbName))
+
+        // Assert
+        using (var context = CreateContext(dbName))
         {
-            var updatedGame = await validationContext.VideoGames.FindAsync(gameToUpdate.Id);
-            Assert.Equal(99.99m, updatedGame!.Price);
+            var updatedGame = await context.VideoGames.FindAsync(originalGame.Id);
+            Assert.NotNull(updatedGame);
+            Assert.Equal(updatedPrice, updatedGame.Price);
         }
     }
 
@@ -106,28 +101,28 @@ public class GameDbContextTests
     {
         var dbName = Guid.NewGuid().ToString();
         var gameToDelete = MockData.GetSingleTestGame();
-        
-        // Arrange: 填充初始数据
-        using (var setupContext = GetInMemoryDbContext(dbName))
+
+        // Arrange
+        using (var context = CreateContext(dbName))
         {
-            setupContext.VideoGames.Add(gameToDelete);
-            await setupContext.SaveChangesAsync();
+            context.VideoGames.Add(gameToDelete);
+            await context.SaveChangesAsync();
         }
-        
-        // Act: 执行删除操作
-        using (var deleteContext = GetInMemoryDbContext(dbName))
+
+        // Act
+        using (var context = CreateContext(dbName))
         {
-            var game = await deleteContext.VideoGames.FindAsync(gameToDelete.Id);
+            var game = await context.VideoGames.FindAsync(gameToDelete.Id);
             Assert.NotNull(game);
 
-            deleteContext.VideoGames.Remove(game);
-            await deleteContext.SaveChangesAsync();
+            context.VideoGames.Remove(game);
+            await context.SaveChangesAsync();
         }
-        
-        // Assert: 使用新的上下文验证删除结果
-        using (var validationContext = GetInMemoryDbContext(dbName))
+
+        // Assert
+        using (var context = CreateContext(dbName))
         {
-            var deletedGame = await validationContext.VideoGames.FindAsync(gameToDelete.Id);
+            var deletedGame = await context.VideoGames.FindAsync(gameToDelete.Id);
             Assert.Null(deletedGame);
         }
     }
@@ -136,24 +131,25 @@ public class GameDbContextTests
     public async Task CanFilterGamesByGenre()
     {
         var dbName = Guid.NewGuid().ToString();
-        // Arrange: 填充数据
-        using (var setupContext = GetInMemoryDbContext(dbName))
+        const string targetGenre = "Action";
+
+        // Arrange
+        using (var context = CreateContext(dbName))
         {
-            setupContext.VideoGames.AddRange(MockData.GetTestGames());
-            await setupContext.SaveChangesAsync();
+            context.VideoGames.AddRange(MockData.GetTestGames());
+            await context.SaveChangesAsync();
         }
 
-        // Act & Assert
-        using (var context = GetInMemoryDbContext(dbName))
+        // Act
+        using (var context = CreateContext(dbName))
         {
-            // Act
             var actionGames = await context.VideoGames
-                .Where(g => g.Genre == "Action")
+                .Where(g => g.Genre == targetGenre)
                 .ToListAsync();
 
             // Assert
             Assert.Single(actionGames);
-            Assert.Equal("Action", actionGames[0].Genre);
+            Assert.Equal(targetGenre, actionGames[0].Genre);
         }
     }
 
@@ -161,27 +157,26 @@ public class GameDbContextTests
     public async Task CanSortGamesByPrice()
     {
         var dbName = Guid.NewGuid().ToString();
-        // Arrange: 填充数据
-        using (var setupContext = GetInMemoryDbContext(dbName))
+        const decimal expectedMinPrice = 19.99m;
+        const decimal expectedMaxPrice = 59.99m;
+
+        // Arrange
+        using (var context = CreateContext(dbName))
         {
-            setupContext.VideoGames.AddRange(MockData.GetTestGames());
-            await setupContext.SaveChangesAsync();
+            context.VideoGames.AddRange(MockData.GetTestGames());
+            await context.SaveChangesAsync();
         }
 
-        // Act & Assert
-        using (var context = GetInMemoryDbContext(dbName))
+        // Act
+        using (var context = CreateContext(dbName))
         {
-            // Act
             var sortedGames = await context.VideoGames
                 .OrderBy(g => g.Price)
                 .ToListAsync();
 
-
-                
-
             // Assert
-            Assert.Equal(19.99m, sortedGames.First().Price);
-            Assert.Equal(59.99m, sortedGames.Last().Price);
+            Assert.Equal(expectedMinPrice, sortedGames.First().Price);
+            Assert.Equal(expectedMaxPrice, sortedGames.Last().Price);
         }
     }
 }
