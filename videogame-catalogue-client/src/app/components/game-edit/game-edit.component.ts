@@ -20,6 +20,35 @@ export class GameEditComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
+
+  genres: string[] = [
+    'Action',
+    'Adventure',
+    'RPG',
+    'Strategy',
+    'Simulation',
+    'Sports',
+    'Racing',
+    'Fighting',
+    'Platformer',
+    'Puzzle',
+    'Shooter',
+    'Horror',
+    'Survival'
+  ];
+
+  
+  platforms: string[] = [
+    'PC',
+    'PlayStation 5',
+    'PlayStation 4',
+    'Xbox Series X',
+    'Xbox One',
+    'Nintendo Switch',
+    'Mobile',
+    'VR'
+  ];
+
   constructor(
     private fb: FormBuilder,
     private gameService: VideoGameService,
@@ -29,8 +58,8 @@ export class GameEditComponent implements OnInit {
     this.gameForm = this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(200)]],
       publisher: ['', [Validators.required, Validators.maxLength(100)]],
-      genre: ['', [Validators.required, Validators.maxLength(50)]],
-      platform: ['', [Validators.required, Validators.maxLength(50)]],
+      genre: ['', [Validators.required]],
+      platform: ['', [Validators.required]],
       releaseDate: ['', Validators.required],
       price: [0, [Validators.required, Validators.min(0)]]
     });
@@ -76,7 +105,7 @@ export class GameEditComponent implements OnInit {
         ...this.gameForm.value
       };
 
-      const operation: Observable<any> = this.isNewGame
+    const operation: Observable<any> = this.isNewGame
         ? this.gameService.create(gameData)
         : this.gameService.update(this.gameId!, gameData);
 

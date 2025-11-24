@@ -54,15 +54,16 @@
             <span class="label-text">Genre</span>
             <span class="label-required">*</span>
           </label>
-          <input
-            type="text"
-            class="form-input"
+          <select
+            class="form-select"
             id="genre"
             formControlName="genre"
-            [class.input-error]="isFieldInvalid('genre')"
-            placeholder="e.g., Action, RPG, Strategy">
+            [class.input-error]="isFieldInvalid('genre')">
+            <option value="" disabled>Select a genre</option>
+            <option *ngFor="let genre of genres" [value]="genre">{{ genre }}</option>
+          </select>
           <div class="error-message" *ngIf="isFieldInvalid('genre')">
-            Genre is required (max 50 characters)
+            Genre is required
           </div>
         </div>
 
@@ -71,15 +72,16 @@
             <span class="label-text">Platform</span>
             <span class="label-required">*</span>
           </label>
-          <input
-            type="text"
-            class="form-input"
+          <select
+            class="form-select"
             id="platform"
             formControlName="platform"
-            [class.input-error]="isFieldInvalid('platform')"
-            placeholder="e.g., PC, PlayStation 5, Xbox">
+            [class.input-error]="isFieldInvalid('platform')">
+            <option value="" disabled>Select a platform</option>
+            <option *ngFor="let platform of platforms" [value]="platform">{{ platform }}</option>
+          </select>
           <div class="error-message" *ngIf="isFieldInvalid('platform')">
-            Platform is required (max 50 characters)
+            Platform is required
           </div>
         </div>
       </div>

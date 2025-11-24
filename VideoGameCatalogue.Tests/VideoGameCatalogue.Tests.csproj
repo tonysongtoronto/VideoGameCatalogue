@@ -8,20 +8,19 @@
   </PropertyGroup>
 
  <ItemGroup>
-    <!-- EF Core InMemory 数据库 - 用于测试 -->
+
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
-    
-    <!-- 测试框架核心包 -->
+
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     
-    <!-- xUnit 测试框架 -->
+
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     
-    <!-- 代码覆盖率收集器 -->
+  
     <PackageReference Include="coverlet.collector" Version="6.0.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

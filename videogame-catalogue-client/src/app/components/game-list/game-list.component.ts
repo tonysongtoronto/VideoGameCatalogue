@@ -18,13 +18,13 @@ export class GameListComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  // 查询相关属性
+
   searchTerm: string = '';
   filterGenre: string = '';
   filterPlatform: string = '';
   sortBy: string = 'title';
 
-  // 用于下拉选项
+
   allGenres: string[] = [];
   allPlatforms: string[] = [];
 
@@ -56,9 +56,9 @@ export class GameListComponent implements OnInit {
   }
 
   extractFilters(): void {
-    // 提取所有唯一的类型
+
     this.allGenres = [...new Set(this.games.map(g => g.genre))].sort();
-    // 提取所有唯一的平台
+
     this.allPlatforms = [...new Set(this.games.map(g => g.platform))].sort();
   }
 
@@ -106,7 +106,7 @@ export class GameListComponent implements OnInit {
     this.applyFilters();
   }
 
-  // 辅助方法：将平台名称转换为 CSS 类名
+
   getPlatformClass(platform: string): string {
     return 'platform-' + platform.toLowerCase().replace(/\s+/g, '-');
   }
