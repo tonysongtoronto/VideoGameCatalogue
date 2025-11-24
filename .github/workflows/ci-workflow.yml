@@ -1,0 +1,40 @@
+name: CI Workflow
+
+# ✅ 触发条件
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# ✅ 工作流任务
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BACKEND_PROJECT_PATH: VideoGameCatalogue/VideoGameCatalogue.csproj
+      TEST_PROJECT_PATH: VideoGameCatalogue.Tests/VideoGameCatalogue.Tests.csproj
+      FRONTEND_DIR: videogame-catalogue-client
+
+    steps:
+      # 1. 拉取代码
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. 设置 Node.js
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      # 3. 安装前端依赖
+      - name: Install Frontend Dependencies (npm install)
+        run: |
+          cd ${{ env.FRONTEND_DIR }}
+          npm install
+
+      # 4. 构建前端
+      - name: Build Frontend (npm run build)
+        run: |
+          cd ${{ env.FRONTEND_DIR }}
+          npm run build --if-present
