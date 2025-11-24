@@ -20,42 +20,59 @@ jobs:
       FRONTEND_DIR: videogame-catalogue-client
 
     steps:
+      # ----------------------------------------
+      # 1. 检出代码
+      # ----------------------------------------
       - name: 1. Checkout repository
         uses: actions/checkout@v4
 
       # ----------------------------------------
-      # 后端 (.NET/C#) 步骤
+      # 2. 后端 (.NET/C#) 步骤
       # ----------------------------------------
-      - name: 2. Setup .NET 8 SDK
+      - name: 2. Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: '9.0.x'  # ✅ 使用稳定版 .NET 8
 
-      - name: 3. Restore Dependencies
+      - name: 3. Restore NuGet Dependencies
         run: dotnet restore ${{ env.SOLUTION_PATH }}
 
-      - name: 4. Build Backend (Release)
-        run: dotnet build ${{ env.BACKEND_PROJECT_PATH }} --configuration Release --no-restore
+      - name: 4. Build Solution (Release)
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+        # ✅ 构建整个解决方案，确保测试项目也被编译
 
       - name: 5. Run Unit Tests
         run: dotnet test ${{ env.TEST_PROJECT_PATH }} --configuration Release --no-build
+        # ✅ 现在测试项目已构建，--no-build 安全可用
 
       # ----------------------------------------
-      # 前端 (Node.js/Angular) 步骤
+      # 3. 前端 (Node.js/Angular) 步骤
       # ----------------------------------------
-      - name: 6. Setup Node.js 22
+      - name: 6. Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22.x'
           cache: 'npm'
+          cache-dependency-path: ${{ env.FRONTEND_DIR }}/package-lock.json
 
-      - name: 7. Install Frontend Dependencies
+      - name: 7. Verify Frontend Directory Exists
+        run: |
+          if [ ! -d "${{ env.FRONTEND_DIR }}" ]; then
+            echo "❌ Error: Frontend directory '${{ env.FRONTEND_DIR }}' not found!"
+            ls -la
+            exit 1
+          fi
+
+      - name: 8. Install Frontend Dependencies
         working-directory: ${{ env.FRONTEND_DIR }}
-        run: npm install
+        run: npm ci  # ✅ 使用 npm ci 更适合 CI（比 npm install 更快、更确定）
 
-      - name: 8. Build Frontend
+      - name: 9. Build Frontend Application
         working-directory: ${{ env.FRONTEND_DIR }}
         run: npm run build --if-present
 
-      - name: 9. CI Summary
-        run: echo "✅ Full-Stack CI/CD Workflow finished successfully!"
+      # ----------------------------------------
+      # 4. 总结
+      # ----------------------------------------
+      - name: 10. CI Summary
+        run: echo "✅ Full-Stack CI/CD Workflow completed successfully!"
